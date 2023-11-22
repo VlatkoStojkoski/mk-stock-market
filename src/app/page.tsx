@@ -8,8 +8,11 @@ export default async function Home() {
 
 	return (
 		<div className="min-h-screen p-8 flex flex-col items-start justify-center">
-			<StocksTable data={data} />
-			{/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+			{
+				data ?
+					<StocksTable data={data} /> :
+					<div className="text-3xl">Loading...</div>
+			}
 		</div>
 	)
 }
