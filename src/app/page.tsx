@@ -7,7 +7,7 @@ export default async function Home() {
 	});
 
 	return (
-		<div className="min-h-screen p-8 flex flex-col items-start justify-center">
+		<div className="container mx-auto min-h-screen p-8 flex flex-col items-start justify-center">
 			{
 				data ?
 					<StocksTable data={data} /> :

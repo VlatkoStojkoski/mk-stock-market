@@ -40,7 +40,7 @@ export default function StocksTable({
 	];
 
 	return (
-		<div className="flex flex-col gap-3 mx-auto flex-grow max-w-full">
+		<div className="w-full flex flex-col gap-3 mx-auto flex-grow max-w-full">
 			{/* @ts-ignore */}
 			<Tabs onSelectionChange={(key: 'ratios' | 'financials') => setSelectedInfo(key)}>
 				<Tab key='ratios' title='Ratios'></Tab>
