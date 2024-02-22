@@ -1,8 +1,9 @@
 import StocksTable from "@/components/StocksTable";
+import { env } from "@/env";
 import { Table as ITable } from "@/lib/api";
 
 export default async function Home() {
-	const res = await fetch('http://localhost:3000/api');
+	const res = await fetch(new URL('/api', env.NEXT_PUBLIC_URL));
 	const data = await res.json() as ITable[];
 
 	return (
