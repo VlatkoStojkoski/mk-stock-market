@@ -7,6 +7,7 @@ export const env = createEnv({
    * Will throw if you access these variables on the client.
    */
   server: {
+    // VERCEL_URL: z.string().min(1),
   },
   /*
    * Environment variables available on the client (and server).
@@ -24,5 +25,6 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+    // VERCEL_URL: process.env.VERCEL_URL,
   },
 });
