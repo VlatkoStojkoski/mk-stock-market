@@ -1,75 +1,51 @@
 'use client';
 
+import { Table as ITable, decodeData } from "@/lib/api";
 import React, { useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tabs, Tab, getKeyValue, Chip } from "@nextui-org/react";
-import { client } from "@/lib/stocks";
-import { IssuerData, IssuersList } from "@/lib/MseClient";
 
 export default function StocksTable({
-	data
+	tables
 }: {
-	data: IssuersList;
+	tables: ITable[];
 }) {
-	// console.log(JSON.stringify(data, null, 2));
-
-	const [selectedInfo, setSelectedInfo] = useState<keyof IssuerData['data']>('ratios');
-
-	const formatPercent = (arg: number) => `${(arg * 100).toFixed(2)}%`;
-	const formatFloat = (arg: number) => arg.toLocaleString('en-US');
-
-	const rows = data.issuers.map((issuer) => ({
-		key: issuer.ticker,
-		ticker: issuer.ticker,
-		...Object.fromEntries(Object.entries(issuer.data[selectedInfo]).map(([key, ratio]) => ([
-			key, (
-				ratio.type === 'float' ?
-					formatFloat(ratio.data[2022]) :
-					ratio.type === 'percent' ?
-						formatPercent(ratio.data[2022]) :
-						'undefined'
-			)
-		])))
-	}));
-
-	const columns = [
-		{
-			label: 'Ticker',
-			key: 'ticker'
-		},
-		...data.columns[selectedInfo]
-	];
+	const [selectedTableIdx, setSelectedTableIdx] = useState<number>(0);
 
 	return (
-		<div className="w-full flex flex-col gap-3 mx-auto flex-grow max-w-full">
-			{/* @ts-ignore */}
-			<Tabs onSelectionChange={(key: 'ratios' | 'financials') => setSelectedInfo(key)}>
-				<Tab key='ratios' title='Ratios'></Tab>
-				<Tab key='financials' title='Financials'></Tab>
+		<div className="flex flex-col gap-3 mx-auto flex-grow max-w-full">
+			<Tabs onSelectionChange={(key) => setSelectedTableIdx(+key)}>
+				{
+					tables.map((table, tIdx) => (
+						<Tab key={tIdx} title={table.label}></Tab>
+					))
+				}
 			</Tabs>
 			<Table aria-label="Example table with dynamic content" className='' classNames={{
 				th: 'px-2 !text-[0.75rem]'
 			}}>
-				<TableHeader columns={columns}>
-					{(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+				<TableHeader columns={tables[selectedTableIdx].columnsDef}>
+					{
+						(tables[selectedTableIdx].columnsDef).map((column) => (
+							<TableColumn key={column.key}>{column.label}</TableColumn>
+						))
+					}
 				</TableHeader>
-				<TableBody items={rows}>
+				<TableBody items={tables[selectedTableIdx].issuers}>
 					{(item) => (
 						<TableRow key={item.key}>
 							{(columnKey) => {
 								const val = getKeyValue(item, columnKey);
+								const floatVal = decodeData(val, 'float');
 
-								if (columnKey === 'indicator') {
-									return (
-										<TableCell className="">
-											<Chip color={
-												!Number.isFinite(+val) ? 'default' : +val < 22.5 ? 'success' : 'danger'
-											} className='min-w-[100%] text-center'>
-												{val}
-											</Chip>
-										</TableCell>
-									)
+								if (columnKey === 'indicator' && typeof floatVal === 'number' && !Number.isNaN(floatVal)) {
+									const color = floatVal < 22.5 ? 'success' : 'danger';
+
+									return <TableCell>
+										<Chip color={color} size='sm'>{floatVal}</Chip>
+									</TableCell>;
 								}
-								return <TableCell>{val}</TableCell>
+
+								return <TableCell>{val}</TableCell>;
 							}}
 						</TableRow>
 					)}
